@@ -68,7 +68,6 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="Content\font-awesome\fonts\fontawesome-webfont.eot" />
     <None Include="Content\font-awesome\fonts\fontawesome-webfont.svg" />
     <None Include="Content\font-awesome\fonts\fontawesome-webfont.ttf" />

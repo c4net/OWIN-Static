@@ -19,18 +19,11 @@ namespace Ormikon.Owin.Static.Config
     /// </owinStatic>
     /// </example>
     /// </summary>
-    public class Section : ConfigurationSection
+    public class Section
     {
         public const string Name = "owinStatic";
-
-        private static readonly Lazy<Section> defaultSection;
-
-        static Section()
-        {
-            defaultSection = new Lazy<Section>(
-                () => ConfigurationManager.GetSection(Name) as Section, true);
-        }
-
+        private readonly static Section _defaultSection = new Section();
+       
         /// <summary>
         /// Is any mapping found in the configuration
         /// </summary>
@@ -61,28 +54,12 @@ namespace Ormikon.Owin.Static.Config
         {
             get
             {
-                return defaultSection.Value;
+                return _defaultSection;
             }
         }
 
-        [ConfigurationProperty("map", IsRequired = false)]
-        public string MapPath
-        {
-            get { return (string)this["map"]; }
-            set { this["map"] = value; }
-        }
+        public string MapPath { get; set; }
 
-        [ConfigurationProperty("maps", IsRequired = false)]
-        public MapElementCollection Sources
-        {
-            get
-            {
-                return (MapElementCollection)this["maps"];
-            }
-            set
-            {
-                this["maps"] = value;
-            }
-        }
+        public IList<MapElement> Sources = new List<MapElement>();
     }
 }

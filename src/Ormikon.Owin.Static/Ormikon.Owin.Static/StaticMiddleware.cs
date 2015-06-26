@@ -25,7 +25,7 @@ namespace Ormikon.Owin.Static
         private readonly int maxAge;
 
         public StaticMiddleware(Func<IDictionary<string, object>, Task> next, StaticSettings settings)
-            : base(next, settings.Cached, settings.Cache, settings.Expires, settings.MaxAge,
+            : base(next, settings.Cached, settings.Expires, settings.MaxAge,
                 settings.CompressedContentTypes)
         {
             if (settings == null)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Configuration;
 
 namespace Ormikon.Owin.Static.Config
@@ -9,119 +10,37 @@ namespace Ormikon.Owin.Static.Config
     /// <map path="/scripts" sources="..\..\Scripts" cached="false" expires="2020-01-01" include="*.js" exclude="**\*1.6.4.js" />
     /// </example>
     /// </summary>
-    public class MapElement : ConfigurationElement
+    public class MapElement
     {
-        [ConfigurationProperty("path", IsRequired = false)]
-        public string Path
+
+        public MapElement()
         {
-            get
-            {
-                return (string)this["path"];
-            }
-            set
-            {
-                this["path"] = value;
-            }
+            MaxAge = "0";
+            DefaultFile = StaticSettings.DefaultFileValue;
+            RedirectIfFolder = true;
         }
 
-        [ConfigurationProperty("sources", IsRequired = true)]
-        public string Sources
-        {
-            get
-            {
-                return (string)this["sources"];
-            }
-            set
-            {
-                this["sources"] = value;
-            }
-        }
+        public string Path { get; set; }
 
-        [ConfigurationProperty("cached", IsRequired = false, DefaultValue = false)]
-        public bool Cached
-        {
-            get
-            {
-                return (bool)this["cached"];
-            }
-            set
-            {
-                this["cached"] = value;
-            }
-        }
+        public string Sources { get; set; }
 
-        [ConfigurationProperty("expires", IsRequired = false)]
-        public DateTimeOffset Expires
-        {
-            get
-            {
-                object result = this["expires"];
-                return result == null ? DateTimeOffset.MinValue : (DateTimeOffset)result;
-            }
-            set
-            {
-                this["expires"] = value;
-            }
-        }
+        public bool Cached { get; set; }
 
-        [ConfigurationProperty("maxAge", IsRequired = false, DefaultValue = "0")]
-        public string MaxAge
-        {
-            get { return (string) this["maxAge"]; }
-            set { this["maxAge"] = value; }
-        }
+        public DateTimeOffset Expires { get; set; }
 
-        [ConfigurationProperty("default", IsRequired = false, DefaultValue = StaticSettings.DefaultFileValue)]
-        public string DefaultFile
-        {
-            get { return (string)this["default"]; }
-            set { this["default"] = value; }
-        }
+        [DefaultValue("0")]
+        public string MaxAge { get; set; }
 
-        [ConfigurationProperty("redirectIfFolder", IsRequired = false, DefaultValue = true)]
-        public bool RedirectIfFolder
-        {
-            get { return (bool)this["redirectIfFolder"]; }
-            set { this["redirectIfFolder"] = value; }
-        }
+        [DefaultValue(StaticSettings.DefaultFileValue)]
+        public string DefaultFile { get; set; }
 
-        [ConfigurationProperty("include", IsRequired = false)]
-        public string Include
-        {
-            get
-            {
-                return (string)this["include"];
-            }
-            set
-            {
-                this["include"] = value;
-            }
-        }
+        [DefaultValue(true)]
+        public bool RedirectIfFolder { get; set; }
 
-        [ConfigurationProperty("exclude", IsRequired = false)]
-        public string Exclude
-        {
-            get
-            {
-                return (string)this["exclude"];
-            }
-            set
-            {
-                this["exclude"] = value;
-            }
-        }
+        public string Include { get; set; }
 
-        [ConfigurationProperty("hidden", IsRequired = false, DefaultValue = false)]
-        public bool AllowHidden
-        {
-            get
-            {
-                return (bool)this["hidden"];
-            }
-            set
-            {
-                this["hidden"] = value;
-            }
-        }
+        public string Exclude { get; set; }
+
+        public bool AllowHidden { get; set; }
     }
 }

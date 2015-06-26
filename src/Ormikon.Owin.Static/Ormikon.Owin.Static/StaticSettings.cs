@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Caching;
 using Ormikon.Owin.Static.Extensions;
 
 namespace Ormikon.Owin.Static
@@ -9,14 +8,10 @@ namespace Ormikon.Owin.Static
     /// </summary>
     public class StaticSettings
     {
-        private const string StaticMemoryCacheConfigurationName = "StaticMemoryCache";
         internal const string DefaultFileValue = "index.html;index.htm;start.html;start.htm;default.html;default.htm";
         internal const string DefaultCompressedTypesFilter = "text/*;*/xml;application/*javascript;application/*json*"
             + ";application/*+xml;image/*+xml";
         private static readonly char[] sourceSeparators = { ';' };
-
-        private static readonly ObjectCache defaultMemoryCache = new MemoryCache(StaticMemoryCacheConfigurationName);
-        private static ObjectCache defaultCache = defaultMemoryCache;
 
         private int maxAge;
 
@@ -52,15 +47,6 @@ namespace Ormikon.Owin.Static
         }
 
         /// <summary>
-        /// Default memory cache that will used in the middleware if custom cache was not set.
-        /// </summary>
-        public static ObjectCache DefaultCache
-        {
-            get { return defaultCache; }
-            set { defaultCache = value ?? defaultMemoryCache; }
-        }
-
-        /// <summary>
         /// The collection of the source paths
         /// </summary>
         public string[] Sources { get; set; }
@@ -69,11 +55,6 @@ namespace Ormikon.Owin.Static
         /// If files in the collection should be cached
         /// </summary>
         public bool Cached { get; set; }
-
-        /// <summary>
-        /// Cache implementation. MemoryCache will be used by default
-        /// </summary>
-        public ObjectCache Cache { get; set; }
 
         /// <summary>
         /// Expires header value for the static content

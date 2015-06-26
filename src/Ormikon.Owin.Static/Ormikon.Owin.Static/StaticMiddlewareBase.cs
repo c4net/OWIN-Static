@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Ormikon.Owin.Static.ResponseSender;
 using Ormikon.Owin.Static.Responses;
@@ -13,52 +12,38 @@ namespace Ormikon.Owin.Static
     internal abstract class StaticMiddlewareBase : OwinMiddleware
     {
         private readonly bool cached;
-        private readonly ObjectCache cache;
+        private readonly IDictionary<string, CachedResponse> cache = new Dictionary<string, CachedResponse>();
         private readonly IResponseSenderFactory responseSenderFactory;
         private readonly DateTimeOffset expires;
         private readonly int maxAge;
 
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next)
-            : this(next, false, null, DateTimeOffset.MinValue, 0)
-        {
-        }
 
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached)
-            : this(next, cached, null, DateTimeOffset.MinValue, 0)
-        {
-        }
-
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached, ObjectCache cache)
-            : this(next, cached, cache, DateTimeOffset.MinValue, 0)
-        {
-        }
-
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached, ObjectCache cache,
+        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached,
             string compressedContentFilter)
-            : this(next, cached, cache, DateTimeOffset.MinValue, 0, compressedContentFilter)
+            : this(next, cached, DateTimeOffset.MinValue, 0, compressedContentFilter)
         {
         }
 
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached, ObjectCache cache,
+        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached,
             DateTimeOffset expires, int maxAge)
-            : this(next, cached, cache, expires, maxAge, StaticSettings.DefaultCompressedTypesFilter)
+            : this(next, cached, expires, maxAge, StaticSettings.DefaultCompressedTypesFilter)
         {
         }
 
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached, ObjectCache cache,
+        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached,
             DateTimeOffset expires, int maxAge, string compressedContentFilter)
-            : this(next, cached, cache, expires, maxAge, new ContentTypeFilter(compressedContentFilter))
+            : this(next, cached, expires, maxAge, new ContentTypeFilter(compressedContentFilter))
         {
         }
 
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached, ObjectCache cache,
+        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached,
             DateTimeOffset expires, int maxAge, IFilter compressedContentFilter)
-            : this(next, cached, cache, expires, maxAge,
+            : this(next, cached, expires, maxAge,
             new ResponseSenderFactory(compressedContentFilter))
         {
         }
 
-        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached, ObjectCache cache,
+        protected StaticMiddlewareBase(Func<IDictionary<string, object>, Task> next, bool cached,
             DateTimeOffset expires, int maxAge, IResponseSenderFactory responseSenderFactory)
             : base(next)
         {
@@ -95,14 +80,17 @@ namespace Ormikon.Owin.Static
 
         private CachedResponse CacheGet(Location location)
         {
-            var c = cache ?? StaticSettings.DefaultCache;
-            return c.Get(location.FullPath) as CachedResponse;
+            if (cache.ContainsKey(location.FullPath))
+            {
+                return cache[location.FullPath];
+            }
+
+            return null;
         }
 
         private void CacheSet(string path, CachedResponse data)
         {
-            var c = cache ?? StaticSettings.DefaultCache;
-            c.Set(path, data, GetCacheOffset());
+            cache[path] =  data;
         }
 
         private Task ProcessResponseStream(IStaticResponse response, Stream stream, IOwinContext ctx)
