@@ -33,7 +33,6 @@ namespace Ormikon.Owin.Static
             sources = settings.Sources;
             if (sources == null || sources.Length == 0)
                 throw new ArgumentException("Sources count should be one or more.", "settings");
-            sources = NormalizeSources(sources);
             indexFiles = ParseIndexFileString(settings.DefaultFile);
             redirectIfFolder = settings.RedirectIfFolderFound;
             include = new FileFilter(settings.Include);
